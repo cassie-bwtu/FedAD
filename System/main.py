@@ -340,10 +340,10 @@ if __name__ == '__main__':
                         help="The levels for computational ability of devices")
     parser.add_argument('-maxf', "--max_flops", type=float, default=16.2,
                         help="The FLOPs for the strong devices")
-    parser.add_argument('-pnlr', "--policy_network_learning_rate", type=float, default=1,
+    parser.add_argument('-pnlr', "--policy_network_learning_rate", type=float, default=5,
                         help="Policy network learning rate")
-    parser.add_argument('-s', "--sigma", type=float, default=0.5)
-    parser.add_argument('-ac', "--add_cons", type=bool, default=False,
+    parser.add_argument('-s', "--sigma", type=float, default=0.3)
+    parser.add_argument('-ac', "--add_cons", type=bool, default=True,
                         help="Whether or not adding flops constraint")
     parser.add_argument('-act', "--add_cons_test", type=bool, default=False,
                         help="Whether or not adding flops constraint for testing")
@@ -397,4 +397,5 @@ if __name__ == '__main__':
     run(args)
 
     print(f"\nTotal time cost: {round(time.time() - total_start, 2)}s.")
+
 
