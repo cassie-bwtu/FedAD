@@ -340,7 +340,7 @@ if __name__ == '__main__':
                         help="The levels for computational ability of devices")
     parser.add_argument('-maxf', "--max_flops", type=float, default=16.2,
                         help="The FLOPs for the strong devices")
-    parser.add_argument('-pnlr', "--policy_network_learning_rate", type=float, default=5,
+    parser.add_argument('-pnlr', "--policy_network_learning_rate", type=float, default=0.5,
                         help="Policy network learning rate")
     parser.add_argument('-s', "--sigma", type=float, default=0.3)
     parser.add_argument('-ac', "--add_cons", type=bool, default=True,
