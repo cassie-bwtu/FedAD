@@ -76,7 +76,7 @@ python main.py -algo=Fedad -m=<model> -data=<dataset> -mn=<model> -nb=<Number_of
 
 ```bash
 python main.py -algo=Fedad -m=regnet -data=Cifar100 -datainfo=noniid_dir -mn=regnet \
-    -lr=0.1 -pnlr=5 -nb=100 -mf=122.90 -basicf=42.68 -maxf=38.71 -nbs=9
+    -lr=0.1 -pnlr=0.5 -nb=100 -mf=122.90 -basicf=42.68 -maxf=38.71 -nbs=9
 ```
 
 ### Arguments
@@ -100,14 +100,14 @@ python main.py -algo=Fedad -m=regnet -data=Cifar100 -datainfo=noniid_dir -mn=reg
 
 The following table provides the recommended parameter settings for different dataset and model combinations:
 
-| Dataset/Model | `-nb` | `-mf` | `-basicf` | `-nbs` |
-|---------------|-------|-------|-----------|--------|
-| CIFAR-100 / ResNet18 | 100 | 74.48 | 5.75 | 8 |
-| EuroSAT-MS / ResNet34 | 62 | 139.78 | 2.20 | 16 |
-| Tiny-ImageNet / ResNet34 | 200 | 600.22 | 23.21 | 16 |
-| EuroSAT-MS / ResNet50 | 62 | 157.18 | 15.88 | 16 |
-| CIFAR-100 / RegNet | 100 | 122.90 | 42.68 | 9 |
-| Tiny-ImageNet / MobileNetV2 | 200 | 52.6 | 27.87 | 10 |
+| Dataset/Model | `-nb` | `-mf` | `-basicf` | `-nbs` | Hardware | Device Computing Power (TFLOPS) | Round Time T (s) |
+|---------------|-------|-------|-----------|--------|----------|---------------------------------|------------------|
+| CIFAR-100 / ResNet18 | 100 | 74.48 | 5.75 | 8 | NVIDIA A40 | {37.13, 22.28, 11.14} | 2.15 |
+| EuroSAT-MS / ResNet34 | 62 | 139.78 | 2.20 | 16 | NVIDIA A40 | {37.13, 22.28, 11.14} | 54.75 |
+| Tiny-ImageNet / ResNet34 | 200 | 600.22 | 23.21 | 16 | NVIDIA A40 | {37.13, 22.28, 11.14} | 31.78 |
+| EuroSAT-MS / ResNet50 | 62 | 157.18 | 15.88 | 16 | NVIDIA RTX A6000 | {38.71, 23.23, 11.61} | 59.51 |
+| CIFAR-100 / RegNet | 100 | 122.90 | 42.68 | 9 | NVIDIA RTX A6000 | {38.71, 23.23, 11.61} | 3.46 |
+| Tiny-ImageNet / MobileNetV2 | 200 | 52.6 | 27.87 | 10 | NVIDIA RTX A6000 | {38.71, 23.23, 11.61} | 2.69 |
 
 ## Supported Models
 
@@ -122,4 +122,21 @@ The following table provides the recommended parameter settings for different da
 - **FedAD** (proposed method)
 - FedAvg
 - FedDrop
+
+
+## Reproducibility
+
+### Random Seeds
+All results in the paper are averaged over 3 independent runs with seeds {7, 32, 42}, controlling client sampling, mini-batch shuffling, and parameter initialization.
+
+### Learning Rates
+Both the classifier learning rate (`-lr=0.1`) and the policy network learning rate (`-pnlr=0.5`) are held constant throughout training. SGD is used as the optimizer.
+
+### Dataset Partitioning
+Non-IID data partitioning follows the Dirichlet (β=0.1) protocol, implemented based on PFLlib (https://github.com/TsingZ0/PFLlib). Each client's local data is further split 9:1 into train/test subsets, and the global test set is the union of all client test subsets.
+
+### Round Time T
+The round time T is computed as the time required to train the average number of samples per client using the complete classifier on devices with sufficient computational resources, following Eq. (6) in the paper. Exact values for each experimental configuration are listed in `Experiment Configurations`.
+
+
 
