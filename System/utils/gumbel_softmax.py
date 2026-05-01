@@ -7,9 +7,8 @@ from torch.autograd import Variable
 import time
 
 def sample_gumbel(shape, device, eps=1e-20):
-    # U = torch.cuda.FloatTensor(shape).uniform_()   #cuda
-    U = torch.FloatTensor(shape).uniform_().to(device)
-    return -Variable(torch.log(-torch.log(U + eps) + eps))
+    U = torch.rand(shape, device=device)
+    return -torch.log(-torch.log(U + eps) + eps)
 
 def gumbel_softmax_sample(logits, device, tau=1):
     y = logits + sample_gumbel(logits.size(), device)
