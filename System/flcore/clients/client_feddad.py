@@ -58,8 +58,6 @@ class clientFedAD(Client):
         self.add_cons = args.add_cons
         self.add_cons_test = args.add_cons_test
         self.mem_usage = []
-        self.record = args.record
-        self.client_records = []
 
         if self.model_name == 'resnet18':
             self.block_names = ['block1', 'block2', 'block3', 'block4', 'block5', 'block6', 'block7', 'block8']
@@ -111,8 +109,6 @@ class clientFedAD(Client):
 
         start_time = time.time()
 
-        if self.record:
-            round_records = []
 
         for epoch in range(max_local_epochs):
             for i, (x, y) in enumerate(trainloader):
@@ -126,7 +122,8 @@ class clientFedAD(Client):
 
                 probs = self.policynet(x)  # (batch,16)
                 poli = torch.add(softmax(torch.mean(probs, dim=0).view(-1, 2), dim=1), v)
-                probs = softmax(poli, dim=1)   #softmax
+                # probs = softmax(poli, dim=1)   #softmax
+                poli, probs = gumbel_softmax(poli, self.device, tau=self.tau, hard=True)
 
                 if self.add_cons:
                     mask = get_policy(probs, self.block_flops, flops_cons).to(self.device)
@@ -134,14 +131,6 @@ class clientFedAD(Client):
 
                 else:
                     policy = poli  #gumbel
-
-                if self.record:
-                    round_records.append({
-                        "batch_id": i,
-                        # "label": y[0].item(),
-                        "label": y.tolist(),
-                        "drop_policy_str": ''.join(map(str, policy[:, 1].to(torch.long).tolist()))  # 保存成 "011" 形式
-                    })
 
                 self.update_time = [a + b for a, b in zip(self.update_time, policy[:, 0].tolist())]
                 reserve_list.append(np.sum(policy[:, 0].tolist()))
@@ -177,8 +166,6 @@ class clientFedAD(Client):
         self.train_time_cost['num_rounds'] += 1  # num_rounds 轮数
         self.train_time_cost['total_cost'] += time.time() - start_time - 0.25  # 训练总时间
 
-        if self.record:
-            self.client_records.append(round_records)
 
         self.drop_info = [1 if n == 0 else 0 for n in self.update_time]
         self.num_reserve = np.mean(reserve_list)
