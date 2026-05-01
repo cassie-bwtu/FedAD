@@ -22,7 +22,7 @@ from pytorch_lightning import seed_everything
 from flcore.trainmodel.policy_network import *
 from torchvision import models
 
-seed = 42
+seed = 32
 seed_everything(seed)
 
 def run(args):
